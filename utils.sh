@@ -74,9 +74,13 @@ getMacAddressOnly()
          #FEATURE_RDKB_WAN_MANAGER
          mac=`cat /sys/class/net/$WANINTERFACE/address | tr '[a-f]' '[A-F]' `
          if [ -z "$mac" ]; then
-            mac=$(sysevent get eth_wan_mac | tr '[a-f]' '[A-F]')
+		if [ "$BOX_TYPE" = "SCER11BEL" ]; then
+			 mac=$(printf "%012X" $((0x$(deviceinfo.sh -cmac | tr -d ':') + 2)) | sed 's/../&:/g;s/:$//')
+		else
+			 mac=$(sysevent get eth_wan_mac | tr '[a-f]' '[A-F]')
+		fi
          fi
-     else	
+     else
         mac=`cat /sys/class/net/$wan_interface/address | sed 's/://g' | tr '[a-f]' '[A-F]'`
      fi
      echo $mac
